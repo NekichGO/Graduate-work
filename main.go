@@ -11,7 +11,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const webDir = "./web"
+const (
+	webDir        = "./web"
+	defaultPort   = "7540"
+	dbFileDefault = "scheduler.db"
+)
 
 func main() {
 	err := run()
@@ -27,12 +31,12 @@ func run() error {
 
 	dbFile := os.Getenv("TODO_DBFILE")
 	if dbFile == "" {
-		return errors.New("TODO_DBFILE env variable empty")
+		dbFile = dbFileDefault
 	}
 
 	port := os.Getenv("TODO_PORT")
 	if port == "" {
-		return errors.New("variable TODO_PORT is empty")
+		port = defaultPort
 	}
 
 	if err := db.Init(dbFile); err != nil {
@@ -48,8 +52,13 @@ func run() error {
 
 func loadEnv() error {
 	err := godotenv.Load(".env")
-	if err != nil {
+	switch {
+	case err == nil:
+		return nil
+	case errors.Is(err, os.ErrNotExist):
+		log.Println("No .env file found, environment variables or default values are used")
+		return nil
+	default:
 		return fmt.Errorf("load .env: %w", err)
 	}
-	return nil
 }
