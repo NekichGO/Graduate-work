@@ -1,0 +1,12 @@
+# файлы IDE
+.vscode/
+.idea/
+
+# файлы ОС
+.DS_Store
+
+# переменные окружения
+.env
+
+# БД
+scheduler.db
